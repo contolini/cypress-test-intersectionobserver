@@ -1,0 +1,39 @@
+<html>
+<body>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla congue feugiat mauris, a dignissim lorem lacinia sit amet. Pellentesque in massa convallis, tempor lectus non, posuere turpis. Quisque in tristique nunc.</p>
+
+  <p>If these paragraphs are blue then the intersection is being correctly calculated because it's based on the iframe's document and not the entire Cypress viewport.</p>
+
+  <p>Another cool paragraph that is supposed to be blue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pharetra ipsum eget molestie ultrices. Integer facilisis nibh nec libero egestas scelerisque. Vivamus metus magna, euismod non vehicula ac, lobortis sed lorem. Integer quam dolor, dignissim eu varius a, sodales non eros. Fusce sed tincidunt eros.</p>
+
+  <p id="last-paragraph">This is the last paragraph on the page. If it's not blue then the intersection is not being correctly calculated because it's based on the entire Cypress viewport and not just the iframe's document. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pharetra ipsum eget molestie ultrices. Integer facilisis nibh nec libero egestas scelerisque. Integer facilisis nibh nec libero egestas scelerisque. Vivamus metus magna, euismod non vehicula ac, lobortis sed lorem. Integer quam dolor, dignissim eu varius a, sodales non eros. Fusce sed tincidunt eros.</p>
+  <script>
+    const blue = 'rgb(0, 0, 255)';
+    
+    const options = {
+      root: document,
+      // Don't include the top half of the page when calculating intersections.
+      // Because Cypress embeds this test page in an iframe, this calculation is based
+      // on the entire page's viewport, and not just the iframe's bounds, if the above
+      // `root: document` option is excluded.
+      rootMargin: '-50% 0px 0px 0px'
+    }
+
+    if (location.search) {
+      delete options.root;
+    }
+
+    const callback = (entries, observer) => {
+      entries.forEach( entry => {
+        if ( entry.intersectionRatio > 0 ) {
+          entry.target.style.color = blue;
+        }
+      } );
+    };
+
+    const observer = new IntersectionObserver(callback, options);
+    const paragraphs = document.querySelectorAll( 'p' );
+    paragraphs.forEach( paragraph => observer.observe( paragraph ) );
+  </script>
+</body>
+</html>
